@@ -50,9 +50,9 @@ font-src/glyphs/**/*.js
 
 package-lock.json
 private.toml
-private-build-plans.toml
+# private-build-plans.toml
 private.mk
-params/private-parameters.toml
+# params/private-parameters.toml
 
 # Ignore tmp directory
 tmp
