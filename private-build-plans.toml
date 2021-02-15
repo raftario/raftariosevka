@@ -4,7 +4,22 @@ spacing = "term"
 serifs = "sans"
 
 [buildPlans.raftariosevka.ligations]
-enables = ["center-ops", "arrow", "trig", "ineq", "ltgt-diamond", "kern-dotty", "llgg"]
+enables = [
+    "center-ops",
+    "arrow",
+    "trig",
+    "eqeqeq",
+    "eqeq",
+    "ineq",
+    "exeqeq",
+    "exeq",
+    "ltgt-diamond",
+    "plusplus",
+    "kern-dotty",
+    "llgg",
+    "llggeq",
+    "html-comment",
+]
 
 [buildPlans.raftariosevka.variants.design]
 capital-a = "straight"
