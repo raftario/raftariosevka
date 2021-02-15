@@ -617,7 +617,9 @@ const PackageSnapshotConfig = computed(`package-snapshot-config`, async target =
 			el: "#packaging-sampler",
 			applyClass: p.snapshotFamily,
 			applyFeature: p.snapshotFeature,
-			name: key
+			name: key,
+			applyCallback: `cbAmendStylisticSetContents`,
+			applyCallbackArgs: { hotChars: [] }
 		});
 	}
 	return cfg;
@@ -662,7 +664,7 @@ const ScreenShot = file.make(
 	img => `images/${img}.png`,
 	async (target, { full }) => {
 		await target.need(TakeSampleImages);
-		await run("optipng", full);
+		await run("optipng", ["--strip", "all"], full);
 	}
 );
 

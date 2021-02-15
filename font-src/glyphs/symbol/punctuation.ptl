@@ -1120,28 +1120,25 @@ glyph-block Symbol-Punctuation-Dashes : begin
 				VBarLeft  SB      y (y + openBoxGap)
 				VBarRight RightSB y (y + openBoxGap)
 
-		create-glyph 'underscore.aboveBaseline' : glyph-proc
-			set-width Width
-			include : HBarBottom SB RightSB 0
+		define UnderScoreConfig : object
+			aboveBaseline { 0         }
+			high          { (-Stroke) }
+			low           { Descender }
 
-			create-derived 'doubleUnderscore.aboveBaseline' : HBarBottom SB RightSB (-openBoxGap)
-			create-derived 'openBox.aboveBaseline' : OpenBoxSide (Stroke / 2)
+		define joiningOverlap (-Width / 6)
 
-		create-glyph 'underscore.high' : glyph-proc
-			set-width Width
-			include : HBarTop SB RightSB 0
-
-			create-derived 'doubleUnderscore.high' : HBarTop SB RightSB (-openBoxGap)
-			create-derived 'openBox.high' : OpenBoxSide (-Stroke / 2)
-
-		create-glyph 'underscore.low' : glyph-proc
-			set-width Width
-			include : HBarBottom SB RightSB Descender
-
-			create-derived 'doubleUnderscore.low' : HBarBottom SB RightSB (Descender - openBoxGap)
-			create-derived 'openBox.low' : OpenBoxSide (Descender + Stroke / 2)
+		foreach { suffix { yBar } } [Object.entries UnderScoreConfig] : do
+			create-glyph "underscore.\(suffix)" : HBarBottom SB RightSB yBar
+			create-glyph "underscore.jr.\(suffix)" : HBarBottom (joiningOverlap - SB) RightSB yBar
+			create-glyph "doubleUnderscore.\(suffix)" : composite-proc
+				HBarBottom SB RightSB yBar
+				HBarBottom SB RightSB (yBar - openBoxGap)
+			create-glyph "openBox.\(suffix)" : composite-proc
+				HBarBottom SB RightSB yBar
+				OpenBoxSide (yBar + Stroke / 2)
 
 		select-variant 'underscore'       '_'
+		select-variant 'underscore.jr'    null   (follow -- 'underscore')
 		select-variant 'openBox'          0x2423 (follow -- 'underscore')
 		select-variant 'doubleUnderscore' 0x2017 (follow -- 'underscore')
 
@@ -1507,19 +1504,29 @@ glyph-block Symbol-Punctuation-Percentages : begin
 
 		local perMilleOffset : Width + l - halfGapRing * 1.5 - m
 
-		create-derived 'percent.ringsContinuousSlashAlsoConnected' : difference
+		define [ConnnectedBar] : difference
 			HBarTop ([mix l (m - halfGapRing) 0.5] - CorrectionOMidX * swRing) (r - swBar * HVContrast) CAP fineBar
 			OShapeOutline.NoOvershoot CAP (CAP / 2 + halfGapRing) l (m - halfGapRing) swRing sma smb
 
-		create-derived 'permille.WWID' [WideUnicode 0x2030] : glyph-proc
+		define [PerMilleProc] : glyph-proc
 			set-width WideWidth0
 			include : OShape (CAP / 2 - halfGapRing) 0 (m + halfGapRing + perMilleOffset) (r + perMilleOffset) swRing sma smb
 			include : Translate ((WideWidth0 - r - perMilleOffset) / 2) 0
-		create-derived 'basepoint.WWID' [WideUnicode 0x2031] : glyph-proc
+
+		define [BasePointProc] : glyph-proc
 			set-width WideWidth0
 			include : OShape (CAP / 2 - halfGapRing) 0 (m + halfGapRing + perMilleOffset) (r + perMilleOffset) swRing sma smb
 			include : OShape (CAP / 2 - halfGapRing) 0 (m + halfGapRing + 2 * perMilleOffset) (r + 2 * perMilleOffset) swRing sma smb
 			include : Translate ((WideWidth0 - r - 2 * perMilleOffset) / 2) 0
+
+		create-derived 'percent.ringsContinuousSlashAlsoConnected' : ConnnectedBar
+		create-derived 'permille.WWID.ringsContinuousSlash' : PerMilleProc
+		create-derived 'basepoint.WWID.ringsContinuousSlash' : BasePointProc
+		create-derived 'permille.WWID.ringsContinuousSlashAlsoConnected' : composite-proc [ConnnectedBar] [PerMilleProc]
+		create-derived 'basepoint.WWID.ringsContinuousSlashAlsoConnected' : composite-proc [ConnnectedBar] [BasePointProc]
+
+	select-variant 'permille.WWID' [WideUnicode 0x2030] (follow -- 'permille.WWID')
+	select-variant 'basepoint.WWID' [WideUnicode 0x2031] (follow -- 'permille.WWID')
 
 	create-glyph 'percent.ringsSegmentedSlash' : glyph-proc
 		set-width Width
@@ -1600,8 +1607,8 @@ glyph-block Symbol-Punctuation-Percentages : begin
 			include : OShape otop  0  l3 r3 swp smap smbp
 
 	select-variant 'percent' '%'
-	select-variant 'permille.NWID'  [NarrowUnicode 0x2030] (follow -- 'permille')
-	select-variant 'basepoint.NWID' [NarrowUnicode 0x2031] (follow -- 'permille')
+	select-variant 'permille.NWID'  [NarrowUnicode 0x2030] (follow -- 'permille.NWID')
+	select-variant 'basepoint.NWID' [NarrowUnicode 0x2031] (follow -- 'permille.NWID')
 
 glyph-block Symbol-Punctuation-Ascii-Marks : begin
 	glyph-block-import CommonShapes
